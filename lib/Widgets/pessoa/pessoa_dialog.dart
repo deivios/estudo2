@@ -1,19 +1,17 @@
-import 'package:estudo2/Widgets/default_dialog_container.dart';
+import 'package:estudo2/Widgets/core/default_dialog_container.dart';
+import 'package:estudo2/controllers/pessoa_controller.dart';
 import 'package:estudo2/extensions/extensions.dart';
 import 'package:estudo2/models/pessoa.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class PessoaDialog extends StatelessWidget {
-  final void Function(Pessoa pessoa) onDeletePessoa;
   final Pessoa pessoa;
-  const PessoaDialog({
-    super.key,
-    required this.pessoa,
-    required this.onDeletePessoa,
-  });
+  const PessoaDialog({super.key, required this.pessoa});
 
   @override
   Widget build(BuildContext context) {
+    final pessoaController = GetIt.instance.get<PessoaController>();
     return AlertDialog(
       actions: [
         Row(mainAxisAlignment: MainAxisAlignment.end, children: []),
@@ -23,15 +21,13 @@ class PessoaDialog extends StatelessWidget {
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               onPressed: () {
-                onDeletePessoa(pessoa);
+                pessoaController.removerPessoa(pessoa);
                 Navigator.of(context).pop();
               },
               child: Text("Excluir", style: TextStyle(color: Colors.black)),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -46,16 +42,10 @@ class PessoaDialog extends StatelessWidget {
           children: [
             Text("Informações do usuário"),
             SizedBox(height: 8),
-            DefaultDialogContainer(
-              child: DefaultDialogContainer(child: Text("Id: ${pessoa.id}")),
-            ),
+            DefaultDialogContainer(child: DefaultDialogContainer(child: Text("Id: ${pessoa.id}"))),
             DefaultDialogContainer(child: Text("Nome: ${pessoa.nome}")),
-            DefaultDialogContainer(
-              child: Text("Peso: ${pessoa.peso.paraPeso()}"),
-            ),
-            DefaultDialogContainer(
-              child: Text("altura: ${pessoa.altura.paraAltura()}"),
-            ),
+            DefaultDialogContainer(child: Text("Peso: ${pessoa.peso.paraPeso()}")),
+            DefaultDialogContainer(child: Text("altura: ${pessoa.altura.paraAltura()}")),
           ],
         ),
       ),

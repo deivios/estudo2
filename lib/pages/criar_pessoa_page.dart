@@ -1,6 +1,8 @@
+import 'package:estudo2/controllers/pessoa_controller.dart';
 import 'package:estudo2/models/criar_pessoa_dto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get_it/get_it.dart';
 
 class CriarPessoaPAge extends StatefulWidget {
   const CriarPessoaPAge({super.key});
@@ -15,6 +17,7 @@ class _CriarPessoaPAgeState extends State<CriarPessoaPAge> {
   final pesoController = TextEditingController();
   final alturaController = TextEditingController();
   final formkey = GlobalKey<FormState>();
+  final pessoaController = GetIt.instance<PessoaController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,8 +95,9 @@ class _CriarPessoaPAgeState extends State<CriarPessoaPAge> {
                             altura: int.parse(alturaController.text),
                             peso: double.parse(pesoController.text.replaceAll(",", ".")),
                           );
-
-                          Navigator.of(context).pop(criarPessoa);
+                          pessoaController.adicionarPessoa(criarPessoa);
+                          
+                          Navigator.of(context).pop();
                         }
                         debugPrint("Valor do nome: ${nomeController.text}");
                         debugPrint("Valor da altura:${alturaController.text}");

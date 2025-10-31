@@ -1,4 +1,4 @@
-import 'package:estudo2/Widgets/default_dialog_container.dart';
+import 'package:estudo2/Widgets/core/default_dialog_container.dart';
 import 'package:estudo2/extensions/extensions.dart';
 import 'package:estudo2/models/pessoa.dart';
 import 'package:flutter/material.dart';

@@ -1,8 +1,10 @@
-import 'package:estudo2/Widgets/lista_pessoas.dart';
+import 'package:estudo2/Widgets/pessoa/lista_pessoas.dart';
+import 'package:estudo2/controllers/pessoa_controller.dart';
+import 'package:estudo2/controllers/theme_controller.dart';
 import 'package:estudo2/models/criar_pessoa_dto.dart';
-import 'package:estudo2/models/pessoa.dart';
 import 'package:estudo2/routes/routes.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,51 +14,82 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<Pessoa> pessoas = [];
+  final pessoaController = GetIt.instance<PessoaController>();
+  final ThemeController themeController = GetIt.instance<ThemeController>();
+
+  @override
+  void initState() {
+    themeController.mensagemNotifier.addListener(_onThemeMensagem);
+    pessoaController.mensagemNotifier.addListener(_onPessoaMensagem);
+    super.initState();
+  }
+
+  void _onThemeMensagem() {
+    print(themeController.mensagemNotifier.value);
+    ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(themeController.mensagemNotifier.value),
+      ),
+    );
+  }
+
+  void _onPessoaMensagem() {
+    print(pessoaController.mensagemNotifier.value);
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.green,
+        content: Text(pessoaController.mensagemNotifier.value),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: Drawer(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Switch(
+              value: themeController.darkTheme,
+              onChanged: (value) {
+                themeController.toggleTheme(value);
+              },
+            ),
+            Text("Tema escuro"),
+          ],
+        ),
+      ),
       appBar: AppBar(title: Text("Meu Primeiro App.")),
-      body: ListaPessoa(
-        pessoas: pessoas,
-        onDeletePessoa: (pessoa) {
-          pessoas.remove(pessoa);
-          setState(() {});
+      body: ListenableBuilder(
+        listenable: pessoaController,
+        builder: (context, child) {
+          return ListaPessoa(pessoas: pessoaController.pessoas);
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.greenAccent,
         onPressed: () async {
-          final result = await Navigator.of(context).pushNamed(Routes.criarPEssoaPage);
+          final result = await Navigator.of(
+            context,
+          ).pushNamed(Routes.criarPEssoaPage);
 
           if (result != null) {
             final pessoaDto = result as CriarPessoaDto;
-            final pessoa = Pessoa(
-              id: pessoas.length + 1,
-              nome: pessoaDto.nome,
-              altura: pessoaDto.altura,
-              peso: pessoaDto.peso,
-            );
-            setState(() {
-              pessoas.add(pessoa);
-            });
+            pessoaController.adicionarPessoa(pessoaDto);
           }
-
-          debugPrint("resultado: $result");
-          // context.pushNamed(Routes.criarPEssoaPage);
-
-          // Navigator.of(context).pushAndRemoveUntil(
-          //   MaterialPageRoute(
-          //     builder: (context) {
-          //       return NovaPagina();
-          //     },
-          //   ),
-          //   (route) => false,
-          // );
         },
         child: Icon(Icons.navigate_next),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    pessoaController.mensagemNotifier.removeListener(_onPessoaMensagem);
+    themeController.mensagemNotifier.removeListener(_onThemeMensagem);
+    super.dispose();
   }
 }
